@@ -25,6 +25,11 @@ namespace AsyncServer
             sd_th.Start();
             cl_th.Start();
 
+            for(int i=0;i<20;i++)
+            {
+                Task.Run(() => ProcessingThreadAsync());
+            }
+
 
             while (!end)
             {
@@ -36,7 +41,7 @@ namespace AsyncServer
                         queue.Enqueue(context);
                     }
                     sem.Release();
-                    Task.Run(() => ProcessingThreadAsync());
+                   
                 }
                 catch (Exception ex)
                 {
@@ -48,75 +53,78 @@ namespace AsyncServer
 
         static async Task ProcessingThreadAsync()
         {
-            try
+            while (!end)
             {
-                await sem.WaitAsync();
-
-                HttpListenerContext context;
-                lock (lockObj)
+                try
                 {
-                    if (end && queue.Count == 0)
-                        return;
-                    context = queue.Dequeue();
-                }
+                    await sem.WaitAsync();
 
-                HttpListenerRequest request = context.Request;
-                HttpListenerResponse response = context.Response;
-                string param = request.Url.Query;
-                string responseText;
-
-                List<long> ids = await server.RequestAsync(param)
-                    .ContinueWith(t =>
+                    HttpListenerContext context;
+                    lock (lockObj)
                     {
-                        logger.Log($"RequestAsync completed, returned {t.Result.Count} ids");
-                        return t.Result;
-                    });
-
-                if (ids.Count == 0)
-                {
-                    responseText = "<li>No results found</li>";
-                    logger.Log("Empty list returned");
-                }
-                else
-                {
-                    List<Task<string>> tasks = new List<Task<string>>();
-                    foreach (long id in ids)
-                    {
-                        Task<string> t = server.GetPicURLAsync(id);
-                        tasks.Add(t);
+                        if (end && queue.Count == 0)
+                            return;
+                        context = queue.Dequeue();
                     }
 
-                    string[] results = await Task.WhenAll(tasks)
+                    HttpListenerRequest request = context.Request;
+                    HttpListenerResponse response = context.Response;
+                    string param = request.Url.Query;
+                    string responseText;
+
+                    List<long> ids = await server.RequestAsync(param)
                         .ContinueWith(t =>
                         {
-                            logger.Log($"WhenAll completed, fetched {t.Result.Length} urls");
+                            logger.Log($"RequestAsync call completed, returned list of id(s)");
                             return t.Result;
                         });
 
-                    List<string> urls = new List<string>();
-                    foreach (string u in results)
+                    if (ids.Count == 0)
                     {
-                        if (!string.IsNullOrEmpty(u))
-                            urls.Add(u);
+                        responseText = "<li>No results found</li>";
+                        logger.Log("Empty list returned");
+                    }
+                    else
+                    {
+                        List<Task<string>> tasks = new List<Task<string>>();
+                        foreach (long id in ids)
+                        {
+                            Task<string> t = server.GetPicURLAsync(id);
+                            tasks.Add(t);
+                        }
+
+                        string[] results = await Task.WhenAll(tasks)
+                            .ContinueWith(t =>
+                            {
+                                logger.Log($"WhenAll completed, fetched {t.Result.Length} urls");
+                                return t.Result;
+                            });
+
+                        List<string> urls = new List<string>();
+                        foreach (string u in results)
+                        {
+                            if (!string.IsNullOrEmpty(u))
+                                urls.Add(u);
+                        }
+
+                        List<string> liItems = new List<string>();
+                        foreach (string u in urls)
+                        {
+                            liItems.Add($"<li><a href='{u}'>{u}</a></li>");
+                        }
+                        responseText = string.Join("\n", liItems);
                     }
 
-                    List<string> liItems = new List<string>();
-                    foreach (string u in urls)
-                    {
-                        liItems.Add($"<li><a href='{u}'>{u}</a></li>");
-                    }
-                    responseText = string.Join("\n", liItems);
+                    byte[] buffer = Encoding.UTF8.GetBytes($"<html><body><ul>{responseText}</ul></body></html>");
+                    response.ContentType = "text/html; charset=utf-8";
+                    response.ContentLength64 = buffer.Length;
+                    await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                    response.OutputStream.Close();
                 }
-
-                byte[] buffer = Encoding.UTF8.GetBytes($"<html><body><ul>{responseText}</ul></body></html>");
-                response.ContentType = "text/html; charset=utf-8";
-                response.ContentLength64 = buffer.Length;
-                await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-                response.OutputStream.Close();
-            }
-            catch (Exception ex)
-            {
-                logger.Log($"ERROR in processing thread: {ex}");
+                catch (Exception ex)
+                {
+                    logger.Log($"ERROR in processing thread: {ex}");
+                }
             }
         }
         static void ShutdownThread()
@@ -131,6 +139,10 @@ namespace AsyncServer
                 {
                     end = true;
                     logger.Log("Shutting down server");
+                    for(int i = 0; i < 20; i++)
+                    {
+                        sem.Release();
+                    }
                     listener.Stop();
                     logger.Write();
                     logger.CloseStream();

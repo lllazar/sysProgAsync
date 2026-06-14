@@ -125,11 +125,11 @@ namespace AsyncServer
             ThreadPool.GetMaxThreads(out int max, out _);
             ThreadPool.GetAvailableThreads(out int free, out _);
 
-            if (max ==free) // ovo je samo radi testiranja, kod kompleksnih sistema ovde bi se pozvala neka funckija ili event koji bi signalizirao da je server idle. 3 ce uvek biti aktivne(vidi se na osnovu maina) i to predstavlja idle za konkretan primer
+            if (max == free) // ovo je samo radi testiranja, kod kompleksnih sistema ovde bi se pozvala neka funckija ili event koji bi signalizirao da je server idle. 3 ce uvek biti aktivne(vidi se na osnovu maina) i to predstavlja idle za konkretan primer
             {
-                cache.ClearCache(10);// moguce je koristiti neku funkciju koja vraca broj koji predstavlja procenat koliko osloboditi kes- memorije na osnovu stanja okruzenja. Ovde je uzeto najprostiji slucaj: prepoloviti kes svaki put kada se pozove metoda
-                logger.Log("Server is idle. Cleared 10% of cache.");
+                logger.Log("Server is idle");
                 logger.Write();
+                cache.ClearCache(40);// moguce je koristiti neku funkciju koja vraca broj koji predstavlja procenat koliko osloboditi kes- memorije na osnovu stanja okruzenja. Ovde je uzeto najprostiji slucaj: prepoloviti kes svaki put kada se pozove metoda
             }
         }
     }

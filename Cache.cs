@@ -102,6 +102,16 @@ namespace AsyncServer
             {
                 int factor = (int)(percentage / 100.0 * cache.Count);
 
+                if (factor == 0 && cache.Count != 0)
+                {
+                    factor = cache.Count;
+                }
+
+                if (cache.Count == 0)
+                {
+                    return;
+                }
+
                 for (int i = 0; i < factor; i++)
                 {
                     long key = keys.First.Value;
@@ -109,7 +119,8 @@ namespace AsyncServer
                     cache.TryRemove(key, out _);
                 }
 
-                logger.Log($"Cache State {cache.Count} / {maxSize}");
+                logger.Log($"Cleared 40% of cache. Cache State {cache.Count} / {maxSize}");
+                logger.Write();
             }
         }
     }

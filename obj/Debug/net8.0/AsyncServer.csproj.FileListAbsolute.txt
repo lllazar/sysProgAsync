@@ -1,0 +1,15 @@
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\bin\Debug\net8.0\AsyncServer.exe
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\bin\Debug\net8.0\AsyncServer.deps.json
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\bin\Debug\net8.0\AsyncServer.runtimeconfig.json
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\bin\Debug\net8.0\AsyncServer.dll
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\bin\Debug\net8.0\AsyncServer.pdb
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\AsyncServer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\AsyncServer.AssemblyInfoInputs.cache
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\AsyncServer.AssemblyInfo.cs
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\AsyncServer.csproj.CoreCompileInputs.cache
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\AsyncServer.dll
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\refint\AsyncServer.dll
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\AsyncServer.pdb
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\AsyncServer.genruntimeconfig.cache
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\ref\AsyncServer.dll
+C:\Users\lazar\Downloads\SistemskoProgramiranje\AsyncServer\obj\Debug\net8.0\AsyncServer.sourcelink.json
